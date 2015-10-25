@@ -1,7 +1,7 @@
 public enum MapChar {
 	DOOR('/'),
-	PATH('p'),
-	ROOM('.'),
+	PATH('.'),
+	ROOM(' '),
 	WALL('#'),
 	STAIRSUP('^'),
 	STAIRSDOWN('v');

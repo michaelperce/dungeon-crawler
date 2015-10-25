@@ -1,5 +1,6 @@
 import java.util.Random;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Path{
 	Point location;
@@ -14,27 +15,35 @@ public class Path{
 		//
 		//Checks to see if 60% of the map is path
 		//
-		Direction lastDir = Direction.LEFT;
-		Direction dir = Direction.UP;
+		Direction dir = null;
 		while (world.percentOfChar(MapChar.PATH) < 0.4d) {
 			//
 			//choosing the direction
 			//
-			do {
-				dir = Direction.values()[rng.nextInt(4)];
-			} while(dir == lastDir.opposite());
+			List<Direction> valids = location.validDirections(world);
+			if (dir != null) {
+				valids.remove(dir.opposite());
+			}
+			dir = valids.get(rng.nextInt(valids.size()));
 
-			lastDir = dir;
 			//
 			//moving the path
 			//
-			for(int i = 0; i < rng.nextInt(20); i ++) {
+			int max = world.getHeight();
+			if (dir == Direction.LEFT || dir == Direction.RIGHT) {
+				max = world.getWidth();
+			}
+			for(int i = 0; i < rng.nextInt(max); i ++) {
 				location.applyDirection(dir);
-				location.wrap(world.getHeight(), world.getWidth());
+				if (!world.isInBounds(location)) {
+					location.applyDirection(dir.opposite());
+					break;
+				}
 				world.set(location, MapChar.PATH);
 			}
 		}
 		seedRooms();
+		expandRooms();
 	}
 	public void seedRooms() {
 		LinkedList<Point> list = world.listWithChar(MapChar.PATH);
@@ -46,14 +55,12 @@ public class Path{
 			room.expand();
 		}
 	}
-	public String toString() {
-		for(int row = 0; row < world.getHeight(); row++) {
-			for(int col = 0; col < world.getWidth(); col++) {
-				Point p = new Point(row, col);
-				System.out.print(world.at(p).asChar());
+	public void expandRooms() {
+		while (world.percentOfChar(MapChar.ROOM) < 0.2) {
+			LinkedList<Point> roomSpots = world.listWithChar(MapChar.ROOM);
+			for (Point spot : roomSpots) {
+				new Room(spot, world).expand();
 			}
-			System.out.println();
 		}
-		return "";
 	}
 }

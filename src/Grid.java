@@ -19,6 +19,10 @@ public class Grid {
 		world = old.clone();
 	}
 
+	public Grid clone() {
+		return new Grid(world);
+	}
+
 
 	public void set(Point p, MapChar c) {
 		world[p.getRow()][p.getCol()] = c;
@@ -72,5 +76,16 @@ public class Grid {
 	public boolean isInBounds(Point p) {
 		return (p.getRow() > -1) && (p.getRow() < this.getHeight())
 			&& (p.getCol() > -1) && (p.getCol() < this.getWidth());
+	}
+
+	public String toString() {
+		for(int row = 0; row < this.getHeight(); row++) {
+			for(int col = 0; col < this.getWidth(); col++) {
+				Point p = new Point(row, col);
+				System.out.print(this.at(p).asChar());
+			}
+			System.out.println();
+		}
+		return "";
 	}
 }

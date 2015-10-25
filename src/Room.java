@@ -8,6 +8,7 @@ public class Room {
 	public Point getLocation() {
 		return location;
 	}
+
 	public void expand() {
 		for (int dr = -1; dr < 2; dr++) {
 			for (int dc = -1; dc < 2; dc++) {
