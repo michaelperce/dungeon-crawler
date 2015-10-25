@@ -1,4 +1,7 @@
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Grid {
 	private MapChar[][] world;
@@ -60,8 +63,8 @@ public class Grid {
 		return (double)(count(ch))/this.area();
 	}
 
-	public LinkedList<Point> listWithChar(MapChar ch) {
-		LinkedList<Point> list = new LinkedList<Point>();
+	public List<Point> listWithChar(MapChar ch) {
+		List<Point> list = new LinkedList<>();
 		for(int r = 0; r < this.getHeight(); r++) {
 			for(int c = 0; c < this.getWidth(); c++) {
 				Point h = new Point(r, c);
@@ -71,6 +74,46 @@ public class Grid {
 			}
 		}
 		return list;
+	}
+
+	public void performOnChar(MapChar ch, Function<Point, MapChar> fn) {
+		for (Point p : listWithChar(ch)) {
+			this.set(p, fn.apply(p));
+		}
+	}
+
+	public List<Point> getNeighborPoints(Point p) {
+		List<Point> out = new LinkedList<>();
+		for (Direction d : Direction.values()) {
+			Point temp = new Point(p);
+			temp.applyDirection(d);
+			if(isInBounds(temp)) {
+				out.add(temp);
+			}
+		}
+		return out;
+	}
+
+	public List<MapChar> getNeighborChars(Point p) {
+		List<MapChar> out = new LinkedList<>();
+		for (Point pt : getNeighborPoints(p)) {
+			out.add(this.at(pt));
+		}
+		return out;
+	}
+
+	public boolean hasNeighbor(Point p, MapChar ch) {
+		return getNeighborChars(p).contains(ch);
+	}
+
+	public int countNeighborsWithChar(Point p, MapChar countMe) {
+		int count = 0;
+		for (MapChar ch : this.getNeighborChars(p)) {
+			if (ch == countMe) {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	public boolean isInBounds(Point p) {
